@@ -81,7 +81,6 @@ window.addEventListener('DOMContentLoaded', function(evt){
          * to DocumentFragment and then add this fragment to desired dom element
          */
         var frag = document.createDocumentFragment();
-
         /*
          * create list with image elements and corresponding loading queue
          */
@@ -107,13 +106,17 @@ window.addEventListener('DOMContentLoaded', function(evt){
         var nextEl = loadQueue.shift();
         if(nextEl) {
             fileReader = new FileReader();
-            fileReader.addEventListener('loadend', function(evt){
-                nextEl.img.addEventListener('load',imageLoadedHandler);
-                nextEl.img.setAttribute('src', this.result);
+            fileReader.addEventListener('loadend', function(evt) {
+                if(this.result) {
+                    nextEl.img.addEventListener('load', imageLoadedHandler);
+                    nextEl.img.setAttribute('src', this.result);
+                }
                 this.removeEventListener('loadend',arguments.calee);
                 loadNextImage();
             });
             fileReader.readAsDataURL(nextEl.file);
+        } else {
+            fileReader = null;
         }
     }
 
