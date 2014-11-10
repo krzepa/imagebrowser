@@ -1,6 +1,18 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #eee;
+}
+#file-chooser {
+    padding: 20px;
+}
+input[type=file] {
+    margin: 0  0 20px 0;
+}
+
 #drop-area {
-    width: 300px;
-    height: 300px;
+    width: 400px;
+    height: 200px;
     background: #d9d9d9;
     border: 2px dashed #666;
 }
@@ -11,15 +23,22 @@
 #file-list {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 0 0 0 20px;
 }
 #file-list li {
     float: left;
-    margin: 0;
+    margin: 0 10px 10px 0;
     padding: 0;
+    width: 150px;
+    height: 150px;
+    background: #d9d9d9;
 }
 #file-list li img {
     cursor: pointer;
     display: block;
-    outline: none;
+}
+#file-list .info {
+    width: auto;
+    max-width: 400px;
+    background: none;
 }

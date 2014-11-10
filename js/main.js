@@ -1,19 +1,41 @@
+/*
+ * execute script when document is completely loaded and parsed
+ * without waiting for loading styles and images
+ */
 window.addEventListener('DOMContentLoaded', function(evt){
-
+    /*
+     * local variables declaration
+     */
     var ACCEPTED_TYPES = ['image/png','image/jpeg'],
         THUMB_WIDTH = 150,
         THUMB_HEIGHT = 150,
         fileBrowserBtn = document.querySelector('#file-browser'),
         fileListCon = document.querySelector('#file-list'),
+        defaultInfo = document.querySelector('#file-list .info'),
         dropArea = document.querySelector('#drop-area');
 
-    fileBrowserBtn.setAttribute('accept',ACCEPTED_TYPES.join(','));
+    /*
+     * restrict browsing files only to specified types
+     * fix for firefox
+     */
+    if(navigator && /firefox/i.test(navigator.userAgent)) {
+        fileBrowserBtn.setAttribute('accept','image/*');
+    } else {
+        fileBrowserBtn.setAttribute('accept',ACCEPTED_TYPES.join(','));
+    }
+
+    /*
+     * get selected files and pass them to the listing function
+     */
     fileBrowserBtn.addEventListener('change',function(evt){
         var files = this.files;
         listFiles(filterFiles(files));
         this.value='';
     });
 
+    /*
+     * drag & drop functionality
+     */
     dropArea.addEventListener('dragleave', function(evt){
         evt.preventDefault();
         this.classList.remove('over');
@@ -29,10 +51,27 @@ window.addEventListener('DOMContentLoaded', function(evt){
         listFiles(filterFiles(files));
     });
 
+    /*
+     * main function which is responsible for generating list of clickable thumbs
+     */
     function listFiles(imageFiles) {
+        /*
+         * remove all li elements if any
+         */
         while(fileListCon.firstChild) {
             fileListCon.removeChild(fileListCon.firstChild);
         };
+        /*
+         * show default info if there is no images
+         */
+        if(!imageFiles.length) {
+            fileListCon.appendChild(defaultInfo);
+            return;
+        }
+        /*
+         * for performance reasons append all newly created html elements
+         * to DocumentFragment and then add this fragment to desired dom element
+         */
         var frag = document.createDocumentFragment();
         imageFiles.forEach(function(el,i){
             var fr = new FileReader(),
@@ -55,6 +94,10 @@ window.addEventListener('DOMContentLoaded', function(evt){
         fileListCon.appendChild(frag);
     }
 
+    /*
+     * convert array-like object to an array and filter out
+     * all files which aren't images of specified types
+     */
     function filterFiles(fileList) {
         var fileList = Array.prototype.slice.call(fileList);
         return fileList.filter(function(el,i){
