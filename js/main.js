@@ -43,6 +43,7 @@ window.addEventListener('DOMContentLoaded', function(evt){
     });
     dropArea.addEventListener('dragover', function(evt){
         evt.preventDefault();
+        evt.dataTransfer.dropEffect='copy';
         this.classList.add('over');
     });
     dropArea.addEventListener('drop', function(evt){
@@ -59,7 +60,7 @@ window.addEventListener('DOMContentLoaded', function(evt){
         /*
          * stop previous loading operation
          */
-        if(fileReader && fileReader.readyState!==2) {
+        if(fileReader && fileReader.readyState!==FileReader.DONE) {
             fileReader.abort();
         }
         /*
