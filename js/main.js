@@ -60,7 +60,6 @@ window.addEventListener('DOMContentLoaded', function(evt){
          * stop previous loading operation
          */
         if(fileReader && fileReader.readyState!==2) {
-            console.log('stop');
             fileReader.abort();
         }
         /*
@@ -91,6 +90,7 @@ window.addEventListener('DOMContentLoaded', function(evt){
             img.setAttribute('width',THUMB_WIDTH);
             img.setAttribute('height',THUMB_HEIGHT);
             img.setAttribute('title',el.name);
+            img.setAttribute('alt',el.name);
             li.appendChild(img);
             frag.appendChild(li);
             return {img:img,file:el};
