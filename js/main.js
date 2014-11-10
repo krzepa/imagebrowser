@@ -12,7 +12,8 @@ window.addEventListener('DOMContentLoaded', function(evt){
         fileBrowserBtn = document.querySelector('#file-browser'),
         fileListCon = document.querySelector('#file-list'),
         defaultInfo = document.querySelector('#file-list .info'),
-        dropArea = document.querySelector('#drop-area');
+        dropArea = document.querySelector('#drop-area'),
+        fileReader, loadQueue;
 
     /*
      * restrict browsing files only to specified types
@@ -56,6 +57,13 @@ window.addEventListener('DOMContentLoaded', function(evt){
      */
     function listFiles(imageFiles) {
         /*
+         * stop previous loading operation
+         */
+        if(fileReader && fileReader.readyState!==2) {
+            console.log('stop');
+            fileReader.abort();
+        }
+        /*
          * remove all li elements if any
          */
         while(fileListCon.firstChild) {
@@ -73,25 +81,48 @@ window.addEventListener('DOMContentLoaded', function(evt){
          * to DocumentFragment and then add this fragment to desired dom element
          */
         var frag = document.createDocumentFragment();
-        imageFiles.forEach(function(el,i){
-            var fr = new FileReader(),
-                li = document.createElement('li'),
-                img = document.createElement('img');
 
+        /*
+         * create list with image elements and corresponding loading queue
+         */
+        loadQueue = imageFiles.map(function(el,i){
+            var li = document.createElement('li'),
+            img = document.createElement('img');
             img.setAttribute('width',THUMB_WIDTH);
             img.setAttribute('height',THUMB_HEIGHT);
             img.setAttribute('title',el.name);
-            img.addEventListener('click',function(evt){
-                window.open(this.getAttribute('src'),'_blank');
-            });
             li.appendChild(img);
             frag.appendChild(li);
-            fr.addEventListener('loadend',function(evt){
-                img.setAttribute('src',fr.result);
-            });
-            fr.readAsDataURL(el);
+            return {img:img,file:el};
         });
         fileListCon.appendChild(frag);
+        loadNextImage();
+    }
+
+    /*
+     * load images sequentially
+     */
+    function loadNextImage() {
+        var nextEl = loadQueue.shift();
+        if(nextEl) {
+            fileReader = new FileReader();
+            fileReader.addEventListener('loadend', function(evt){
+                nextEl.img.addEventListener('load',imageLoadedHandler);
+                nextEl.img.setAttribute('src', this.result);
+                this.removeEventListener('loadend',arguments.calee);
+                loadNextImage();
+            });
+            fileReader.readAsDataURL(nextEl.file);
+        }
+    }
+
+    /*
+     * assign click handler to image when it is loaded
+     */
+    function imageLoadedHandler(evt) {
+        this.addEventListener('click',function(evt){
+            window.open(this.getAttribute('src'),'_blank');
+        });
     }
 
     /*
