@@ -134,13 +134,9 @@ window.addEventListener('DOMContentLoaded', function(evt){
      * all files which aren't images of specified types
      */
     function filterFiles(fileList) {
-        var fileList = Array.prototype.slice.call(fileList);
+        fileList = Array.prototype.slice.call(fileList);
         return fileList.filter(function(el,i){
-            if(ACCEPTED_TYPES.indexOf(el.type)!==-1) {
-                return true;
-            } else {
-                return false;
-            }
+            return ACCEPTED_TYPES.indexOf(el.type)!==-1;
         });
     }
 });
